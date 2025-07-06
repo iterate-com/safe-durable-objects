@@ -1,6 +1,6 @@
 {
   "name": "safe-durable-objects",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "tRPC-style Safe RPC methods for Cloudflare Durable Objects",
   "type": "module",
   "main": "dist/index.js",
@@ -34,6 +34,10 @@
     "name": "BlankParticle",
     "email": "hello@blankparticle.com",
     "url": "https://blankparticle.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BlankParticle/safe-durable-objects"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.12.4",
