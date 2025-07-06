@@ -204,8 +204,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT © [BlankParticle](https://blankparticle.com)
+MIT © [Iterate](https://iterate.com)
 
 ## Support
 
-If you have any questions or need help, please open an issue on [GitHub](https://github.com/BlankParticle/safe-durable-objects).
+If you have any questions or need help, please open an issue on [GitHub](https://github.com/iterate-com/safe-durable-objects).

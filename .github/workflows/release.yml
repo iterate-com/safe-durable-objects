@@ -13,7 +13,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.head_commit.message, 'chore(release):') && github.repository_owner == 'BlankParticle'
+    if: startsWith(github.event.head_commit.message, 'chore(release):') && github.repository_owner == 'iterate-com'
     steps:
       - uses: actions/checkout@v4
         with:

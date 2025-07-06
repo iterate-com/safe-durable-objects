@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BlankParticle/safe-durable-objects"
+    "url": "https://github.com/iterate-com/safe-durable-objects"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.12.4",
