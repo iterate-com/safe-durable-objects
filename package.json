@@ -1,0 +1,49 @@
+{
+  "name": "safe-durable-objects",
+  "version": "0.0.1",
+  "description": "tRPC-style Safe RPC methods for Cloudflare Durable Objects",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "example:dev": "wrangler dev example/worker.ts",
+    "example:deploy": "wrangler deploy example/worker.ts",
+    "publish:npm": "pnpm build && pnpm publish --access public --no-git-checks"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "durable objects",
+    "zod",
+    "safe",
+    "safe-durable-objects"
+  ],
+  "author": {
+    "name": "BlankParticle",
+    "email": "hello@blankparticle.com",
+    "url": "https://blankparticle.com"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.12.4",
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.20250705.0",
+    "zod": "^3.25.74"
+  },
+  "devDependencies": {
+    "tsdown": "^0.12.9",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.23.0"
+  }
+}
