@@ -29,6 +29,7 @@ export class MyDurableObject extends SafeDurableObjectBuilder(
     hello: fn
       .input(z.string())
       .output(z.object({ message: z.string(), id: z.string() }))
+      .meta({ description: "Say hello to the server" })
       .implement(function ({ ctx, input }) {
         const state = this.state;
         this.setState({

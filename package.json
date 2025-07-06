@@ -42,8 +42,8 @@
   "license": "MIT",
   "packageManager": "pnpm@10.12.4",
   "peerDependencies": {
-    "@cloudflare/workers-types": "^4.20250705.0",
-    "zod": "^3.25.74"
+    "@cloudflare/workers-types": "^4",
+    "zod": "^3.25"
   },
   "devDependencies": {
     "tsdown": "^0.12.9",

@@ -9,10 +9,10 @@ importers:
   .:
     dependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20250705.0
+        specifier: ^4
         version: 4.20250705.0
       zod:
-        specifier: ^3.25.74
+        specifier: ^3.25
         version: 3.25.74
     devDependencies:
       tsdown:
