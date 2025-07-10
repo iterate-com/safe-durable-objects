@@ -3,21 +3,26 @@ import type { DurableObject } from "cloudflare:workers";
 
 export const SafeRpcMethodSymbol = Symbol("SafeRpcMethod");
 
-export type ImplArgs<I extends z.ZodType, Env> = {
+export type ImplArgs<I extends z.ZodType | undefined, Env> = {
   env: Env;
   ctx: DurableObjectState;
-  input: z.infer<I>;
+  input: I extends z.ZodType ? z.infer<I> : void;
 };
 
 export type SafeRpcHandler<
-  I extends z.ZodType,
+  I extends z.ZodType | undefined,
   O extends z.ZodType,
   InferredOutput = z.infer<O>,
   Meta = unknown
-> = {
-  (input: z.infer<I>): Promise<InferredOutput>;
+> = (I extends z.ZodType
+  ? {
+      (input: z.infer<I>): Promise<InferredOutput>;
+    }
+  : {
+      (): Promise<InferredOutput>;
+    }) & {
   _def: {
-    input: I;
+    input: I extends z.ZodType ? I : z.ZodObject<{}>;
     output: O;
     meta: Meta;
   };
@@ -27,7 +32,7 @@ export type SafeRpcHandler<
 type MaybePromise<T> = T | Promise<T>;
 
 function createHandler<
-  I extends z.ZodType,
+  I extends z.ZodType | undefined,
   O extends z.ZodType,
   Env,
   T extends DurableObject<Env>,
@@ -38,20 +43,28 @@ function createHandler<
   outputSchema?: O,
   meta?: Meta
 ) {
-  const handler = async function (this: T, rawInput: z.infer<I>) {
-    const parsedInput = await inputSchema.parseAsync(rawInput);
+  const handler = async function (
+    this: T,
+    rawInput?: I extends z.ZodType ? z.infer<I> : never
+  ) {
+    const parsedInput = inputSchema
+      ? await inputSchema.parseAsync(rawInput)
+      : undefined;
+
     const result = await fn.call(this, {
       env: this.env,
       ctx: this.ctx,
       input: parsedInput,
-    });
+    } as ImplArgs<I, Env>);
+
     return outputSchema ? await outputSchema.parseAsync(result) : result;
   };
 
   const handlerWithDef = Object.defineProperties(handler, {
     _def: {
       value: {
-        input: inputSchema,
+        // We use z.object({}) as the default input schema as most AI agents expect this incase there is no input
+        input: inputSchema ?? z.object({}),
         output: outputSchema ?? z.unknown(),
         meta: meta ?? {},
       },
@@ -96,7 +109,6 @@ class RouteBuilder<
   }
 
   output<OutputSchema extends z.ZodType>(
-    this: RouteBuilder<Env, T, I, undefined, Meta>,
     outputSchema: OutputSchema
   ): RouteBuilder<Env, T, I, OutputSchema, Meta> {
     if (this.outputSchema) throw new Error("Output schema already set");
@@ -118,31 +130,22 @@ class RouteBuilder<
 
   implement<R>(
     this: RouteBuilder<Env, T, I, undefined, Meta>,
-    fn: I extends z.ZodType
-      ? (this: T, args: ImplArgs<I, Env>) => MaybePromise<R>
-      : never
-  ): I extends z.ZodType ? SafeRpcHandler<I, z.ZodUnknown, R, Meta> : never;
+    fn: (this: T, args: ImplArgs<I, Env>) => MaybePromise<R>
+  ): SafeRpcHandler<I, z.ZodUnknown, R, Meta>;
 
-  implement(
+  implement<OutputType>(
     this: RouteBuilder<Env, T, I, O, Meta>,
-    fn: I extends z.ZodType
-      ? O extends z.ZodType
-        ? (this: T, args: ImplArgs<I, Env>) => MaybePromise<z.infer<O>>
-        : never
+    fn: O extends z.ZodType
+      ? (this: T, args: ImplArgs<I, Env>) => MaybePromise<z.infer<O>>
       : never
-  ): I extends z.ZodType
-    ? O extends z.ZodType
-      ? SafeRpcHandler<I, O, z.infer<O>, Meta>
-      : never
-    : never;
+  ): O extends z.ZodType ? SafeRpcHandler<I, O, z.infer<O>, Meta> : never;
 
   implement(
-    fn: (this: T, args: ImplArgs<any, Env>) => MaybePromise<any>
+    fn: (this: T, args: any) => MaybePromise<any>
   ): SafeRpcHandler<any, any, any, Meta> {
-    if (!this.inputSchema) throw new Error("Input schema is required");
     return createHandler(
       fn,
-      this.inputSchema as z.ZodType,
+      this.inputSchema as z.ZodType | undefined,
       this.outputSchema as z.ZodType | undefined,
       this.metaData
     ) as SafeRpcHandler<any, any, any, Meta>;
@@ -189,6 +192,6 @@ export function SafeDurableObjectBuilder<
 
 export function isSafeDurableObjectMethod(
   method: any
-): method is SafeRpcHandler<any, any, any, any> {
+): method is SafeRpcHandler<any, any> {
   return method && method[SafeRpcMethodSymbol] === true;
 }

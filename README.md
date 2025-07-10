@@ -85,6 +85,11 @@ export class MyDurableObject extends SafeDurableObjectBuilder(
           id: ctx.id.toString(),
         };
       }),
+    ping: fn.output(z.object({ message: z.string() })).implement(function () {
+      return {
+        message: "pong",
+      };
+    }),
   })
 ) {}
 
@@ -122,7 +127,7 @@ fn.input(inputSchema).implement(handler); // output schema is optional
 
 **Note: Only `zod/v4` schemas are supported**
 
-##### `.input(schema)`
+##### `.input(schema)` (optional)
 
 Defines the input validation schema using Zod. The input will be validated at runtime.
 

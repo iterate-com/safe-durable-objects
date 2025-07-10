@@ -41,6 +41,11 @@ export class MyDurableObject extends SafeDurableObjectBuilder(
           id: ctx.id.toString(),
         };
       }),
+    ping: fn.output(z.object({ message: z.string() })).implement(function ({}) {
+      return {
+        message: "pong",
+      };
+    }),
   })
 ) {}
 
@@ -49,7 +54,8 @@ export default {
     const stub = env.MY_DURABLE_OBJECT.get(
       env.MY_DURABLE_OBJECT.idFromName("test")
     );
-    const res = await stub.hello("world");
-    return Response.json(res);
+    const hello = await stub.hello("world");
+    const ping = await stub.ping();
+    return Response.json({ hello, ping });
   },
 } as ExportedHandler<Env>;
