@@ -1,6 +1,6 @@
 {
   "name": "safe-durable-objects",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "tRPC-style Safe RPC methods for Cloudflare Durable Objects",
   "type": "module",
   "main": "dist/index.js",
