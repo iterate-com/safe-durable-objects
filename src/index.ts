@@ -174,7 +174,7 @@ export function SafeDurableObjectBuilder<
     Object.fromEntries(
       Object.entries(router).map(([key, value]) => [
         key,
-        { value, enumerable: true },
+        { value, enumerable: true, writable: true, configurable: true },
       ])
     )
   );
@@ -182,6 +182,8 @@ export function SafeDurableObjectBuilder<
   Object.defineProperty(BaseClassWithSafeRpc.prototype, "_def", {
     value: router,
     enumerable: true,
+    writable: true,
+    configurable: true,
   });
 
   return BaseClassWithSafeRpc as AnyDurableClass<
