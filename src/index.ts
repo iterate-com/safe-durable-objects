@@ -48,16 +48,34 @@ function createHandler<
     rawInput?: I extends z.ZodType ? z.infer<I> : never
   ) {
     const parsedInput = inputSchema
-      ? await inputSchema.parseAsync(rawInput)
+      ? await inputSchema.safeParseAsync(rawInput)
       : undefined;
+
+    if (parsedInput && !parsedInput.success) {
+      const errors = z.flattenError(parsedInput.error);
+      throw new Error(
+        `Input doesn't match schema:\n${JSON.stringify(errors, null, 2)}`
+      );
+    }
 
     const result = await fn.call(this, {
       env: this.env,
       ctx: this.ctx,
-      input: parsedInput,
+      input: parsedInput?.data,
     } as ImplArgs<I, Env>);
 
-    return outputSchema ? await outputSchema.parseAsync(result) : result;
+    if (!outputSchema) return result;
+
+    const parsedOutput = await outputSchema.safeParseAsync(result);
+
+    if (!parsedOutput.success) {
+      const errors = z.flattenError(parsedOutput.error);
+      throw new Error(
+        `Output doesn't match schema:\n${JSON.stringify(errors, null, 2)}`
+      );
+    }
+
+    return parsedOutput.data;
   };
 
   const handlerWithDef = Object.defineProperties(handler, {
@@ -69,10 +87,14 @@ function createHandler<
         meta: meta ?? {},
       },
       enumerable: true,
+      writable: true,
+      configurable: true,
     },
     [SafeRpcMethodSymbol]: {
       value: true,
       enumerable: true,
+      writable: true,
+      configurable: true,
     },
   });
 
