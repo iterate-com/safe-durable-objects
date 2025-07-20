@@ -31,7 +31,7 @@ export type SafeRpcHandler<
 
 type MaybePromise<T> = T | Promise<T>;
 
-function createHandler<
+export function createHandler<
   I extends z.ZodType | undefined,
   O extends z.ZodType,
   Env,
@@ -101,7 +101,7 @@ function createHandler<
   return handlerWithDef;
 }
 
-class RouteBuilder<
+export class RouteBuilder<
   Env,
   T extends DurableObject<Env>,
   I extends z.ZodType | undefined = undefined,
