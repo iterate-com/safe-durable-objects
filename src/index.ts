@@ -173,10 +173,10 @@ export class RouteBuilder<
     ) as SafeRpcHandler<any, any, any, Meta>;
   }
 }
-type AnyDurableClass<T extends DurableObject, Env> = new (
-  ctx: DurableObjectState,
-  env: Env
-) => T;
+
+type AnyDurableClass<T extends DurableObject, Env, Extra = {}> = {
+  new (ctx: DurableObjectState, env: Env): T & Extra;
+};
 
 export function SafeDurableObjectBuilder<
   Env,
@@ -209,8 +209,9 @@ export function SafeDurableObjectBuilder<
   });
 
   return BaseClassWithSafeRpc as AnyDurableClass<
-    T & Router & { _def: Router },
-    Env
+    T,
+    Env,
+    Router & { _def: Router }
   >;
 }
 

@@ -11,20 +11,22 @@ type Env = {
   MY_DURABLE_OBJECT: DurableObjectNamespace<MyDurableObject>;
 };
 
-export class MyDurableObject extends SafeDurableObjectBuilder(
-  class extends DurableObject<Env> {
-    state: State;
-    constructor(public ctx: DurableObjectState, public env: Env) {
-      super(ctx, env);
-      this.state = {
-        count: 0,
-        lastMessage: "",
-      };
-    }
-    setState(state: State) {
-      this.state = state;
-    }
-  },
+class BaseDurableObject extends DurableObject<Env> {
+  state: State;
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+    this.state = {
+      count: 0,
+      lastMessage: "",
+    };
+  }
+  setState(state: State) {
+    this.state = state;
+  }
+}
+
+export const MyDurableObject = SafeDurableObjectBuilder(
+  BaseDurableObject,
   (fn) => ({
     hello: fn
       .input(z.string())
@@ -47,7 +49,9 @@ export class MyDurableObject extends SafeDurableObjectBuilder(
       };
     }),
   })
-) {}
+);
+
+export type MyDurableObject = InstanceType<typeof MyDurableObject>;
 
 export default {
   async fetch(request, env, ctx) {
