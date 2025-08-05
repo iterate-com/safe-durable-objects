@@ -40,14 +40,14 @@
     "url": "https://github.com/iterate-com/safe-durable-objects"
   },
   "license": "MIT",
-  "packageManager": "pnpm@10.12.4",
+  "packageManager": "pnpm@10.14.0",
   "peerDependencies": {
     "@cloudflare/workers-types": "^4",
-    "zod": "^3.25"
+    "zod": "^3.25 || ^4"
   },
   "devDependencies": {
     "tsdown": "^0.12.9",
-    "typescript": "^5.8.3",
-    "wrangler": "^4.24.1"
+    "typescript": "^5.9.2",
+    "wrangler": "^4.28.0"
   }
 }
