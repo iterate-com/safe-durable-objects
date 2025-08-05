@@ -68,10 +68,8 @@ jobs:
       - name: Create NPM Release
         if: steps.version.outputs.version != ''
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         run: |
-          npm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
           if ! npm view "safe-durable-objects@${{ steps.version.outputs.version }}" version >/dev/null 2>&1; then
             pnpm run publish:npm
           else
