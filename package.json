@@ -49,5 +49,8 @@
     "tsdown": "^0.12.9",
     "typescript": "^5.9.2",
     "wrangler": "^4.28.0"
+  },
+  "dependencies": {
+    "agents": "^0.0.109"
   }
 }

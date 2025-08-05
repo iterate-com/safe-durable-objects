@@ -1,65 +1,48 @@
 import { z } from "zod/v4";
-import { SafeDurableObjectBuilder } from "../src/index";
+import { makeRpcCapable } from "../src/rpc";
 import { DurableObject } from "cloudflare:workers";
-
-type State = {
-  count: number;
-  lastMessage: string;
-};
 
 type Env = {
   MY_DURABLE_OBJECT: DurableObjectNamespace<MyDurableObject>;
 };
 
-class BaseDurableObject extends DurableObject<Env> {
-  state: State;
+const rpc = makeRpcCapable<MyDurableObject>();
+export class MyDurableObject extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    this.state = {
-      count: 0,
-      lastMessage: "",
-    };
+    rpc.init(this);
   }
-  setState(state: State) {
-    this.state = state;
+
+  hello = rpc
+    .input(z.string())
+    .output(z.string())
+    .implement(function ({ input }) {
+      return `Hello, ${input}!`;
+    });
+
+  ping = rpc.output(z.string()).implement(function () {
+    return "pong";
+  });
+
+  async normalMethod() {
+    const hello = await this.hello("world");
+    return `Normal method: ${hello}`;
   }
 }
 
-export const MyDurableObject = SafeDurableObjectBuilder(
-  BaseDurableObject,
-  (fn) => ({
-    hello: fn
-      .input(z.string())
-      .output(z.object({ message: z.string(), id: z.string() }))
-      .meta({ description: "Say hello to the server" })
-      .implement(function ({ ctx, input }) {
-        const state = this.state;
-        this.setState({
-          count: state.count + 1,
-          lastMessage: input,
-        });
-        return {
-          message: `Hello, ${input}!! state: ${JSON.stringify(state)}`,
-          id: ctx.id.toString(),
-        };
-      }),
-    ping: fn.output(z.object({ message: z.string() })).implement(function ({}) {
-      return {
-        message: "pong",
-      };
-    }),
-  })
-);
-
-export type MyDurableObject = InstanceType<typeof MyDurableObject>;
-
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const name = url.searchParams.get("name");
+    if (!name) {
+      return Response.json({ error: "name is required" }, { status: 400 });
+    }
     const stub = env.MY_DURABLE_OBJECT.get(
-      env.MY_DURABLE_OBJECT.idFromName("test")
+      env.MY_DURABLE_OBJECT.idFromName(name)
     );
+    const normalMethod = await stub.normalMethod();
     const hello = await stub.hello("world");
     const ping = await stub.ping();
-    return Response.json({ hello, ping });
+    return Response.json({ hello, ping, normalMethod });
   },
 } as ExportedHandler<Env>;
