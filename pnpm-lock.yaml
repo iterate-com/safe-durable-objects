@@ -15,8 +15,8 @@ importers:
         specifier: ^0.0.109
         version: 0.0.109(@cloudflare/workers-types@4.20250705.0)(react@19.1.1)
       zod:
-        specifier: ^3.25 || ^4
-        version: 3.25.74
+        specifier: ^4.0.15
+        version: 4.0.15
     devDependencies:
       tsdown:
         specifier: ^0.12.9
@@ -1243,6 +1243,9 @@ packages:
   zod@3.25.74:
     resolution: {integrity: sha512-J8poo92VuhKjNknViHRAIuuN6li/EwFbAC8OedzI8uxpEPGiXHGQu9wemIAioIpqgfB4SySaJhdk0mH5Y4ICBg==}
 
+  zod@4.0.15:
+    resolution: {integrity: sha512-2IVHb9h4Mt6+UXkyMs0XbfICUh1eUrlJJAOupBHUhLRnKkruawyDddYRCs0Eizt900ntIMk9/4RksYl+FgSpcQ==}
+
 snapshots:
 
   '@ai-sdk/provider-utils@2.2.8(zod@3.25.74)':
@@ -2373,3 +2376,5 @@ snapshots:
   zod@3.22.3: {}
 
   zod@3.25.74: {}
+
+  zod@4.0.15: {}

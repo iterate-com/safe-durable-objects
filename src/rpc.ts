@@ -1,7 +1,10 @@
 import { isSafeDurableObjectMethod, RouteBuilder, SafeRpcHandler } from ".";
 import { DurableObject } from "cloudflare:workers";
 
+type Constructor<T> = new (...args: any[]) => T;
 export function makeRpcCapable<T extends DurableObject<any>>() {
+
+
   const init = (BaseClass: T) => {
     const router = Object.fromEntries(
       Object.keys(BaseClass)
@@ -32,6 +35,12 @@ export function makeRpcCapable<T extends DurableObject<any>>() {
     });
   };
 
+  const staticInit = (BaseClazz: Constructor<T>) => {
+    const staticInstance = new BaseClazz();
+    
+    init(staticInstance);
+    return staticInstance;
+  };
   const rpc = new RouteBuilder();
 
   Object.defineProperty(rpc, "init", {
@@ -47,5 +56,6 @@ export function makeRpcCapable<T extends DurableObject<any>>() {
      * Call this method to initialize the RPC capabilities in constructor.
      */
     init: typeof init;
+    staticInit: typeof staticInit;
   };
 }

@@ -43,7 +43,7 @@
   "packageManager": "pnpm@10.14.0",
   "peerDependencies": {
     "@cloudflare/workers-types": "^4",
-    "zod": "^3.25 || ^4"
+    "zod": "^4.0.15"
   },
   "devDependencies": {
     "tsdown": "^0.12.9",

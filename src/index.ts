@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z, toJSONSchema } from "zod/v4";
 import type { DurableObject } from "cloudflare:workers";
 
 export const SafeRpcMethodSymbol = Symbol("SafeRpcMethod");
@@ -83,7 +83,9 @@ export function createHandler<
       value: {
         // We use z.object({}) as the default input schema as most AI agents expect this incase there is no input
         input: inputSchema ?? z.object({}),
+        inputSchema: toJSONSchema(inputSchema ?? z.object({})),
         output: outputSchema ?? z.unknown(),
+        outputSchema: toJSONSchema(outputSchema ?? z.unknown()),
         meta: meta ?? {},
       },
       enumerable: true,
